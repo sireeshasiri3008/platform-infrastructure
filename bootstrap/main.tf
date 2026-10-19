@@ -76,3 +76,16 @@ resource "aws_dynamodb_table" "terraform_locks" {
     ManagedBy   = "Terraform"
   }
 }
+# --- S3 Lifecycle Rule to Expire Non-Current State Versions (Free Tier Optimization) ---
+resource "aws_s3_bucket_lifecycle_configuration" "state_lifecycle" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  rule {
+    id     = "expire-old-state-versions"
+    status = "Enabled"
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+  }
+}
